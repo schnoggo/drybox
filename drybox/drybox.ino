@@ -51,7 +51,6 @@ void setup() {
   bicolor_LEDs1.begin(bicolor_addresses[1]);  // I2C address of display module
   bicolor_LEDs0.clear();
   bicolor_LEDs1.clear();
-  init_HDC();
 }
 
 
@@ -158,6 +157,8 @@ void NextMode(){
         case MODE_HELLO:
           set_display_text("Hello!  ", 60);
         break;
+        }
       }
     }
+  }
 }
