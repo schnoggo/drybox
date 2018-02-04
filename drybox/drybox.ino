@@ -9,6 +9,8 @@
 Adafruit_BicolorMatrix bicolor_LEDs0 = Adafruit_BicolorMatrix();
 Adafruit_BicolorMatrix bicolor_LEDs1 = Adafruit_BicolorMatrix();
 String display_string;
+uint8_t anim_frame = 0;
+
 
 #define TAILENGTH 4
 #define STARTX 5
@@ -42,7 +44,9 @@ bicolor_LEDs1.begin(bicolor_addresses[1]);  // I2C address of display module
 
 
   //  set_display_text("goody ");
-    set_display_text(String(45));
+  String ttt = String(45);
+  String humidity = String(ttt + '%');
+    set_display_text(String(humidity + " humidity"));
 }
 
 
