@@ -8,6 +8,7 @@
 
 Adafruit_BicolorMatrix bicolor_LEDs0 = Adafruit_BicolorMatrix();
 Adafruit_BicolorMatrix bicolor_LEDs1 = Adafruit_BicolorMatrix();
+String display_string;
 
 #define TAILENGTH 4
 #define STARTX 5
@@ -38,60 +39,15 @@ bicolor_LEDs1.begin(bicolor_addresses[1]);  // I2C address of display module
   tailColor[0]=LED_RED; // color of the "head"
     bicolor_LEDs0.clear();
     bicolor_LEDs1.clear();
+
+
+  //  set_display_text("goody ");
+    set_display_text(String(45));
 }
 
 
 
 void loop() {
-  //erase the last pixel of the tail:
-     bicolor_LEDs0.drawPixel(ball[TAILENGTH-1][0], ball[TAILENGTH-1][1], LED_OFF);
-     bicolor_LEDs1.drawPixel(ball[TAILENGTH-1][0], ball[TAILENGTH-1][1], LED_OFF);
-
-    // shif thte data down the tail:
-    // not using a a loop beacuse simple assignments will be smaller for this array
-
-    ball[3][0]=ball[2][0];
-    ball[3][1]=ball[2][1];
-    ball[2][0]=ball[1][0];
-    ball[2][1]=ball[1][1];
-    ball[1][0]=ball[0][0];
-    ball[1][1]=ball[0][1];
-    // bounce a ball:
-    ball[0][0] = ball[1][0] + ballVX;
-    ball[0][1] = ball[1][1] + ballVY;
-    newDX=ballVX;
-    newDY=ballVY;
-    // check for bounds
-    if ((ball[0][0] > 7) || (ball[0][0] < 0)){
-     newDX = 0 - ballVX;
-     ball[0][0]=ball[0][0]+newDX; // we went out of bounds, so back up
-     if (newDX != 0){
-       newDY = (random(3)-1);
-     }
-    }
-
-    if ((ball[0][1] > 7) || (ball[0][1] < 0)){
-     newDY = 0 - ballVY;
-     ball[0][1]=ball[0][1]+newDY; // we went out of bounds, so back up
-
-     if (newDY != 0){
-       newDX = (random(3)-1);
-     }
-    }
-
- ballVX=newDX; // copy the new vectors to the global values
- ballVY=newDY;
-    for(int j=3;j>=0; j--){
-      bicolor_LEDs0.drawPixel(ball[j][0], ball[j][1], tailColor[j]);
-      bicolor_LEDs1.drawPixel(ball[j][0], ball[j][1], tailColor[j]);
-
-    }
-
-    bicolor_LEDs0.writeDisplay();
-    bicolor_LEDs1.writeDisplay();
-
-
-    delay(40);
-
-
+//  update_bouncy();
+  update_text();
 }
