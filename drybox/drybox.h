@@ -6,12 +6,23 @@
  */
 
 #include <Wire.h>
+#include <SPI.h>
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_HDC1000.h"
+#include <WiFi101.h>
+#include "credentials.h"
+/*
+  The credentials.h file (not included in git repo)
+  contains these definitions:
+  #define AIO_KEY "thing from adafruit.io"
+  #define WIFI_SSID "your wifi ssid"
+  #define WIFI_PW "your wifi password"
+ */
 
 // code compile-time options:
 #define HDC_i2c  0x40
+
 
 // other animation Constants:
 #define FADE_LENGTH 5

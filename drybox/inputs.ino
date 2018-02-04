@@ -1,13 +1,11 @@
 void init_HDC(){
   hdc = Adafruit_HDC1000();
 
-
-  if (!hdc.begin()) {
-
-
-  set_display_text("Failed sensor");
+  if (hdc.begin()) {
+    set_display_text("Sensor GOOOD!", 72);
+  } else {
+    set_display_text("Failed sensor", 72);
   }
-
 }
 
 
