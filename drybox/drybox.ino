@@ -43,8 +43,7 @@ byte mode_index=0; // 99 = just display curent mesage and never stop
 byte modes[]{MODE_START, MODE_HELLO, MODE_TEST, MODE_CONNECT, MODE_MONITOR };
 
 void setup() {
-  //Configure pins for Adafruit ATWINC1500 Feather
-  WiFi.setPins(8,7,4,2);
+
   randomSeed(analogRead(0)); // seed stream with noise from unconnected pin
   Serial.begin(9600);
   bicolor_LEDs0.begin(bicolor_addresses[0]);  // I2C address of display module
@@ -77,7 +76,7 @@ void loop() {
   // waiting for wifi:
       switch (WiFi.status()){
         case WL_IDLE_STATUS: // waiting for connection
-
+        set_error_text("IDLE", 50);
           if (anim_complete){reset_display_text();}
         break;
 
@@ -90,6 +89,10 @@ void loop() {
           set_error_text("Not connected.   ", 80);
         break;
 
+        case WL_NO_SSID_AVAIL: // connection attempt failed
+          set_error_text("No SSID ", 40);
+        break;
+        
         default:
           set_error_text("WiFi error.   ", 80);
       }
@@ -116,6 +119,7 @@ void loop() {
   break;
 
   case MODE_PAUSE:
+    update_text();
     if (anim_complete){reset_display_text();}
 
   }
@@ -126,8 +130,11 @@ void loop() {
 
 void NextMode(){
 //All globals
-  if (99 != mode_index){ // 99 means we just stop but continue to loop text
+  if (99 == mode_index){ // 99 means we just stop but continue to loop text
+
+  } else {
     if (anim_complete){
+      dprintln("anim complete");
       byte current_mode = modes[mode_index];
       mode_index++;
       byte next_mode = modes[mode_index];
@@ -139,26 +146,37 @@ void NextMode(){
         break;
 
         case MODE_CONNECT:
-        // attempt to connect to WiFi network:
-        if (WiFi.status() == WL_NO_SHIELD) {
+          dprintln("wifi connect");
+          //Configure pins for Adafruit ATWINC1500 Feather
+          WiFi.setPins(8,7,4,2);
+          // attempt to connect to WiFi network:
+          if (WiFi.status() == WL_NO_SHIELD) {
+            set_error_text("No wifi shield", 70);
+          } else {
+            set_display_text("CONNECTING", 60);
+            /*
+            //String connection_msg = String("Attempting to connect to SSID: " + String(WIFI_SSID);
+            //  String connection_msg = "go go go go go go go go go go ";
+            set_display_text("go go go go gone            ", 200);
+            // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
 
-          //String connection_msg = String("Attempting to connect to SSID: " + String(WIFI_SSID);
-      //  String connection_msg = "go go go go go go go go go go ";
-          set_display_text("go go go go gone            ", 200);
-
-          // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-          wifi_status = WiFi.begin(WIFI_SSID, WIFI_PW);
-
-
+            */
+            char ssid[] = WIFI_SSID;    // your network SSID (name)
+            char pass[] = WIFI_PW;
+            wifi_status = WiFi.begin(ssid, pass);
+          }
         break;
+
         case MODE_MONITOR:
           set_display_text("INIT   ", 26);
         break;
+
         case MODE_HELLO:
           set_display_text("Hello!  ", 60);
         break;
-        }
-      }
-    }
+
+
+      } //   switch (next_mode)
+    } //anim_complete
   }
 }

@@ -27,7 +27,7 @@
 // other animation Constants:
 #define FADE_LENGTH 5
 
-// #define PRDBG
+ #define PRDBG
 // macros:
 // create Serial.print macros:
 #ifdef PRDBG
