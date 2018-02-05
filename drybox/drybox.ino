@@ -121,14 +121,37 @@ void loop() {
 
 
     if (anim_complete == true){
-      String ttt = String( read_temp() );
+      int32_t current_temp =  read_temp();
+      String ttt = String( current_temp ); // can go negative!
       temperature_string = String(ttt + 'C');
-      ttt = String( read_humidity() );
+      int32_t current_humid =  read_humidity();
+      ttt = String( current_humid );
       humidity_string = String( ttt +  '%' );
 
       //String humidity = String(temperature_string + '%');
       set_display_text(String(temperature_string +  ", " + humidity_string + "    "    ), 72);
-      last_reading = now;
+
+      if ((now - READING_FREQUENCY)> last_reading){
+        if (! humid1.publish( current_humid )) {
+             Serial.println(F("Failed"));
+        } else {
+            Serial.println(F("OK!"));
+        }
+/*
+
+        Serial.print(F("\nSending "));
+          Serial.print(x);
+          Serial.print("...");
+          if (! photocell.publish(x++)) {
+            Serial.println(F("Failed"));
+          } else {
+            Serial.println(F("OK!"));
+          }
+*/
+
+
+        last_reading = now;
+      }
     }
 
 
