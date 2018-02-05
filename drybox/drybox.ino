@@ -33,6 +33,10 @@ char server[] = "www.google.com";    // name address for Google (using DNS)
 WiFiClient client;
 int wifi_status = WL_IDLE_STATUS;
 
+// Adafruit.io MQTT stuff:
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+
+
 #define MODE_TEST 0
 #define MODE_CONNECT 1
 #define MODE_MONITOR 2
@@ -92,7 +96,7 @@ void loop() {
         case WL_NO_SSID_AVAIL: // connection attempt failed
           set_error_text("No SSID ", 40);
         break;
-        
+
         default:
           set_error_text("WiFi error.   ", 80);
       }

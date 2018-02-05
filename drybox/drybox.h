@@ -10,6 +10,8 @@
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_HDC1000.h"
+#include "Adafruit_MQTT.h"
+#include "Adafruit_MQTT_Client.h"
 #include <WiFi101.h>
 #include "credentials.h"
 /*
