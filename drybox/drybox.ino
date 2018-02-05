@@ -15,9 +15,7 @@ boolean anim_complete =  false;
 uint8_t bicolor_addresses[]{0x70, 0x76};
 uint32_t last_reading = 0;
 uint32_t now = last_reading;
-#define READING_FREQUENCY 10000
-
-
+#define READING_FREQUENCY 300000
 
 String humidity_string;
 String temperature_string;
@@ -137,19 +135,8 @@ void loop() {
         } else {
             Serial.println(F("OK!"));
         }
-/*
 
-        Serial.print(F("\nSending "));
-          Serial.print(x);
-          Serial.print("...");
-          if (! photocell.publish(x++)) {
-            Serial.println(F("Failed"));
-          } else {
-            Serial.println(F("OK!"));
-          }
-*/
-
-
+        temp1.publish(current_temp);
         last_reading = now;
       }
     }
