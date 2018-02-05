@@ -35,6 +35,15 @@ int wifi_status = WL_IDLE_STATUS;
 
 // Adafruit.io MQTT stuff:
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+/****************************** Feeds ***************************************/
+
+// Setup a feed called 'photocell' for publishing.
+// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
+Adafruit_MQTT_Publish humid1 = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/drybox.internal-humidity");
+Adafruit_MQTT_Publish temp1 = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/drybox.internal-temp");
+
+// Setup a feed called 'onoff' for subscribing to changes.
+//Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
 
 
 #define MODE_TEST 0
@@ -42,9 +51,10 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 #define MODE_MONITOR 2
 #define MODE_HELLO 3
 #define MODE_START 4
+#define MODE_INIT_MQTT 5
 #define MODE_PAUSE 99
 byte mode_index=0; // 99 = just display curent mesage and never stop
-byte modes[]{MODE_START, MODE_HELLO, MODE_TEST, MODE_CONNECT, MODE_MONITOR };
+byte modes[]{MODE_START, MODE_HELLO, MODE_TEST, MODE_CONNECT, MODE_INIT_MQTT, MODE_MONITOR };
 
 void setup() {
 
@@ -61,6 +71,8 @@ void setup() {
 void loop() {
   uint8_t this_mode = MODE_PAUSE;
   now = millis();
+  uint8_t mqtt_return;
+
   if (99 != mode_index){
     this_mode = modes[mode_index];
   }
@@ -122,6 +134,21 @@ void loop() {
 
   break;
 
+
+  case MODE_INIT_MQTT:
+    if (0 == anim_frame){ // first loop throught the text
+      mqtt_return = mqtt.connect(); // 0 for success
+      if (0 == mqtt_return){
+        anim_complete = true;
+      } else {
+      //  Retrying
+      set_display_text("RETRY MQTT", 60);
+         mqtt.disconnect();
+      }
+      update_text();
+    }
+  break;
+
   case MODE_PAUSE:
     update_text();
     if (anim_complete){reset_display_text();}
@@ -171,6 +198,21 @@ void NextMode(){
           }
         break;
 
+        case MODE_INIT_MQTT:
+
+        // Stop if already connected.
+         if (mqtt.connected()) {
+
+         } else {
+             set_display_text("Connect MQTT...    ", 60);
+        // Serial.print("Connecting to MQTT... ");
+
+       }
+
+
+
+
+        break;
         case MODE_MONITOR:
           set_display_text("INIT   ", 26);
         break;
