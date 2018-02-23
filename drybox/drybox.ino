@@ -15,7 +15,7 @@ boolean anim_complete =  false;
 uint8_t bicolor_addresses[]{0x70, 0x76};
 uint32_t last_reading = 0;
 uint32_t now = last_reading;
-#define READING_FREQUENCY 300000
+#define READING_INTERVAL 60000
 
 String humidity_string;
 String temperature_string;
@@ -50,9 +50,18 @@ Adafruit_MQTT_Publish temp1 = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/
 #define MODE_HELLO 3
 #define MODE_START 4
 #define MODE_INIT_MQTT 5
+#define MODE_RECONNECT 6
 #define MODE_PAUSE 99
 byte mode_index=0; // 99 = just display curent mesage and never stop
-byte modes[]{MODE_START, MODE_HELLO, MODE_TEST, MODE_CONNECT, MODE_INIT_MQTT, MODE_MONITOR };
+byte modes[]{ // sequence of modes (next mode)
+  MODE_START,
+  MODE_HELLO,
+  MODE_TEST,
+  MODE_CONNECT,
+  MODE_INIT_MQTT,
+  MODE_MONITOR,
+  MODE_CONNECT
+};
 
 void setup() {
 
@@ -119,6 +128,9 @@ void loop() {
 
 
     if (anim_complete == true){
+
+
+
       int32_t current_temp =  read_temp();
       String ttt = String( current_temp ); // can go negative!
       temperature_string = String(ttt + 'C');
@@ -129,15 +141,20 @@ void loop() {
       //String humidity = String(temperature_string + '%');
       set_display_text(String(temperature_string +  ", " + humidity_string + "    "    ), 72);
 
-      if ((now - READING_FREQUENCY)> last_reading){
-        if (! humid1.publish( current_humid )) {
-             Serial.println(F("Failed"));
-        } else {
-            Serial.println(F("OK!"));
-        }
+      if ((now - READING_INTERVAL)> last_reading){
+        if (IsWiFiActive){
+          if (! humid1.publish( current_humid )) {
+               Serial.println(F("Failed"));
+          } else {
+              Serial.println(F("OK!"));
+          }
 
-        temp1.publish(current_temp);
-        last_reading = now;
+          temp1.publish(current_temp);
+          last_reading = now;
+        }
+      } else {
+        mode_index = MODE_RECONNECT; // global
+        NextMode();
       }
     }
 
@@ -235,4 +252,26 @@ void NextMode(){
       } //   switch (next_mode)
     } //anim_complete
   }
+}
+boolean IsWiFiActive(){
+  boolean is_active =  true;
+  int wifi_status;
+  wifi_status = WiFi.status();
+  if ( ( WL_NO_SHIELD == wifi_status)
+    or ( WL_CONNECTION_LOST == wifi_status)
+    or ( WL_DISCONNECTED == wifi_status)
+  ){
+      is_active =  false;
+
+      if ( WL_NO_SHIELD == wifi_status) {
+        dprintln("WL_NO_SHIELD");
+      }
+      if ( WL_CONNECTION_LOST == wifi_status) {
+        dprintln("WL_CONNECTION_LOST");
+      }
+      if ( WL_DISCONNECTED == wifi_status) {
+        dprintln("WL_DISCONNECTED");
+      }
+  }
+  return is_active;
 }
