@@ -9,7 +9,7 @@ void reset_display_text(){
   anim_complete =  false;
 }
 void set_error_text(String in_string, uint8_t text_width){
-  mode_index = 99;
+  current_mode = MODE_PAUSE; // global
   set_display_text(in_string, text_width );
 }
 
