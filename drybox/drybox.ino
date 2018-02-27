@@ -76,6 +76,7 @@ void setup() {
 
   randomSeed(analogRead(0)); // seed stream with noise from unconnected pin
   Serial.begin(9600);
+  WiFi.setPins(8,7,4,2); // for the Feather M0. Seems to really want to be in setup()
   bicolor_LEDs0.begin(bicolor_addresses[0]);  // I2C address of display module
   bicolor_LEDs1.begin(bicolor_addresses[1]);  // I2C address of display module
   bicolor_LEDs0.clear();
@@ -106,15 +107,16 @@ void loop() {
 
     case MODE_TEST_WIFI:
       wifi_status = WiFi.status();
-      if (WL_CONNECTED == wifi_status){
-        anim_complete = true;
+      if (WL_CONNECTED == wifi_status){ // still connected?
+        anim_complete = true; // yes, then this mode is finished. move on
       } else {
-        anim_complete = false;
-        current_mode =  MODE_CONNECTING_WIFI;
-        WiFi.setPins(8,7,4,2);
+        anim_complete = false; // nope. We have stuff to display
+
+        dprintln ("MODE_TEST_WIFI: not connected");
+        current_mode =  MODE_CONNECTING_WIFI; // this just delays a bit for things to connect
         // attempt to connect to WiFi network:
-        if (WiFi.status() == WL_NO_SHIELD) {
-          set_error_text("No wifi shield", 70);
+        if (WL_NO_SHIELD == wifi_status) {
+          set_error_text("No wifi shield", 70); // this has been true in testing - find out how
         } else {
           set_display_text("CONNECTING", 60);
           /*
